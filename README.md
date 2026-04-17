@@ -1,4 +1,4 @@
-# Universal Chat Web Page
+# Universal Chat Web App
 
 This project is a front-end real-time general web chat where multiple users join one shared room.
 
@@ -37,7 +37,7 @@ It uses Firebase Authentication + Firestore and can be hosted on any static web 
 1. **Authentication** -> **Sign-in method** -> enable **Email/Password**.
 2. **Firestore Database** -> create database (start in test mode for local testing, then lock rules before production).
 
-### 3) Configure this web page
+### 3) Configure this web app
 
 1. Open `index.html`.
 2. Replace `firebaseConfig` placeholder values (`YOUR_API_KEY`, etc.) with your own Firebase app config.
@@ -61,7 +61,7 @@ Serve as static files, for example:
 python -m http.server 8080
 
 # Node.js
-npx serve .
+npx serve . -l 8080
 ```
 
 Then open [http://localhost:8080](http://localhost:8080) (if using a server).
@@ -112,13 +112,17 @@ If you're a happy user of `github.com/alexpreli`, I would really appreciate your
 
 You can support me using the Ko-fi and PayPal links.
 
-<a href="https://ko-fi.com/preli">
-  <img src="https://img.shields.io/badge/Support_on-Ko--fi-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white" width="180">
-</a>
+<div>
+  <a href="https://ko-fi.com/preli">
+    <img src="https://img.shields.io/badge/Support_on-Ko--fi-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white" width="180">
+  </a>
+</div>
 
-<a href="https://paypal.me/preli7">
-  <img src="https://img.shields.io/badge/Donate_on-PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white" width="180">
-</a>
+<div>
+  <a href="https://paypal.me/preli7">
+    <img src="https://img.shields.io/badge/Donate_on-PayPal-0070BA?style=for-the-badge&logo=paypal&logoColor=white" width="180">
+  </a>
+</div>
 
 ## Patreon Page
 
