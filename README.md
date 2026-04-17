@@ -30,7 +30,7 @@ It uses Firebase Authentication + Firestore and can be hosted on any static web 
 
 1. Go to [Firebase Console](https://console.firebase.google.com/).
 2. Create a new project.
-3. In your project, create a **Web Page** and copy its config values.
+3. In your project, create a **Web App** and copy its config values.
 
 ### 2) Enable Firebase services
 
