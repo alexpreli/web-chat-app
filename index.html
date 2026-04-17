@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Chatting Platform</title>
+    <link rel="icon" type="image/svg+xml" href="chat-icon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, getDocs, getDoc, doc, setDoc, runTransaction, deleteField, query, where, orderBy, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.firebase = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, collection, addDoc, getDocs, getDoc, doc, setDoc, runTransaction, deleteField, query, where, orderBy, onSnapshot, serverTimestamp };
+    </script>
+</head>
+
+<body>
+    
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="auth-container">
+                <h2 id="authTitle">Welcome! Please login or create an account.</h2>
+                <form id="authForm">
+                    <div class="input-group">
+                        <input type="email" id="username" placeholder="Email" required>
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="input-group" id="passwordGroup" style="display: none;">
+                        <input type="password" id="password" placeholder="Password">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div id="authError" class="auth-error" style="display: none;"></div>
+                    <button type="submit" id="authButton">Login</button>
+                    <p class="auth-switch">
+                        <span id="authSwitchText">Don't have an account?</span>
+                        <a href="#" id="authSwitchLink">Create account</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="chatApp" class="chat-app" style="display: none;">
+        
+        <div class="background-blur"></div>
+
+        
+        <main class="messages-container">
+            <div class="messages" id="messagesList">
+                
+            </div>
+        </main>
+
+        
+        <div class="input-area">
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <div class="user-info">
+                        <div class="user-avatar" id="userAvatar"></div>
+                        <div class="user-details">
+                            <h3 id="currentUsername">User</h3>
+                            <span class="online-status">Online</span>
+                        </div>
+                    </div>
+                    <input type="text" id="messageInput" placeholder="Type a message..." maxlength="1000">
+                    <button id="sendBtn" class="send-btn" title="Send message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                    <button id="voiceBtn" class="voice-btn" title="Voice message">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+                <div class="input-options">
+                    <button class="option-btn" id="imageBtn">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <button class="option-btn" id="videoBtn">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="option-btn" id="emojiBtn" title="Emojis">
+                        <i class="fas fa-smile"></i>
+                    </button>
+                    <button class="option-btn" id="stickerBtn" title="Stickers">
+                        <i class="fas fa-sticky-note"></i>
+                    </button>
+                    <button class="option-btn" id="gifBtn" title="GIFs">
+                        <i class="fas fa-images"></i>
+                    </button>
+                    <button class="option-btn" id="clearBtn" title="Clear all messages for this session">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="option-btn" id="clearAllBtn" title="Clear all messages permanently">
+                        <i class="fas fa-trash-can"></i>
+                    </button>
+                    <button class="option-btn" id="refreshMessagesBtn" title="Refresh all messages">
+                        <i class="fas fa-rotate"></i>
+                    </button>
+                    <button class="option-btn" id="logoutBtn" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        
+        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+        <input type="file" id="videoInput" accept="video/*" style="display: none;">
+    </div>
+
+    
+    <div id="emojiPicker" class="emoji-picker" style="display: none;">
+        <div class="emoji-categories">
+            <button class="emoji-category active" data-category="smileys">😀</button>
+            <button class="emoji-category" data-category="hearts">❤️</button>
+            <button class="emoji-category" data-category="gestures">👋</button>
+            <button class="emoji-category" data-category="objects">🎉</button>
+        </div>
+        <div class="emoji-grid" id="emojiGrid">
+            
+        </div>
+    </div>
+
+    
+    <div id="gifPicker" class="gif-picker" style="display: none;">
+        <div class="gif-search">
+            <input type="text" id="gifSearch" placeholder="Search GIFs...">
+            <button id="gifSearchBtn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <div class="gif-grid" id="gifGrid">
+            
+        </div>
+    </div>
+
+    
+    <div id="stickerPicker" class="sticker-picker" style="display: none;">
+        <div class="sticker-grid" id="stickerGrid"></div>
+    </div>
+
+    
+    <script>window.GIPHY_API_KEY = '';</script>
+    <script src="script.js"></script>
+</body>
+
+</html>
