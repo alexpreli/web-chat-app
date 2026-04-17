@@ -15,7 +15,7 @@ It uses Firebase Authentication + Firestore and can be hosted on any static web 
 
 ## Demo
 
-![Chat Webpage Demo](page_example.png)
+![Chat Webpage Demo](webpage-demo.png)
 
 ## Tech Stack
 
